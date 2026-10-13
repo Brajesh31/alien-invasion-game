@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: "Alien Invasion Game"
+message: "If you use this software, please cite the repository."
+type: software
+authors:
+  - family-names: Kumar
+    given-names: Brajesh
+    affiliation: "Independent"
+repository-code: "https://github.com/brajesh31/alien-invasion-game"
+abstract: "A small Python and Pygame arcade game."
+keywords:
+  - Python
+  - Pygame
+  - arcade game
+license: MIT
+version: 0.1.0
