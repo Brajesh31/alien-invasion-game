@@ -58,12 +58,12 @@ jobs:
           from urllib.parse import unquote, urlsplit
 
           markdown_files = [Path("README.md"), *Path("docs").rglob("*.md")]
-          link_pattern = re.compile(r"!?[[^]]*](([^)]+))")
+          link_pattern = re.compile(r"!?(?:\[[^\]]*\])\(([^)]+)\)")
           errors = []
 
           for markdown_file in markdown_files:
-              text = markdown_file.read_text(encoding="utf-8")
-              for raw_target in link_pattern.findall(text):
+              content = markdown_file.read_text(encoding="utf-8")
+              for raw_target in link_pattern.findall(content):
                   target = raw_target.strip().split()[0].strip("<>")
                   parsed = urlsplit(target)
                   if parsed.scheme or parsed.netloc or target.startswith("#"):
