@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Brajesh31/alien-invasion-game/blob/main/SECURITY.md
+    about: Report security issues privately. Do not publish exploit details in an issue.
+  - name: Documentation index
+    url: https://github.com/Brajesh31/alien-invasion-game/blob/main/docs/README.md
+    about: Review the project's guides before opening a documentation request.
