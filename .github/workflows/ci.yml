@@ -1,0 +1,82 @@
+name: Python and Documentation Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate source and documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile Python source
+        run: python -m py_compile alien_invasion.py
+
+      - name: Validate required runtime assets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          required = [
+              "background.jpg",
+              "background.wav",
+              "bullet.png",
+              "bullet.wav",
+              "explosion.wav",
+              "icon.png",
+              "spaceship.png",
+              "ufo.png",
+              "Roboto-Bold.ttf",
+              "Roboto-Medium.ttf",
+          ]
+          missing = [item for item in required if not Path(item).is_file()]
+          if missing:
+              raise SystemExit(f"Missing required runtime assets: {', '.join(missing)}")
+          print(f"Validated {len(required)} required runtime assets.")
+          PY
+
+      - name: Validate documentation links
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+          from urllib.parse import unquote, urlsplit
+
+          markdown_files = [Path("README.md"), *Path("docs").rglob("*.md")]
+          link_pattern = re.compile(r"!?[[^]]*](([^)]+))")
+          errors = []
+
+          for markdown_file in markdown_files:
+              text = markdown_file.read_text(encoding="utf-8")
+              for raw_target in link_pattern.findall(text):
+                  target = raw_target.strip().split()[0].strip("<>")
+                  parsed = urlsplit(target)
+                  if parsed.scheme or parsed.netloc or target.startswith("#"):
+                      continue
+                  path_part = unquote(parsed.path)
+                  if not path_part:
+                      continue
+                  resolved = (markdown_file.parent / path_part).resolve()
+                  if not resolved.exists():
+                      errors.append(f"{markdown_file}: missing {target}")
+
+          if errors:
+              print("\n".join(errors))
+              sys.exit(1)
+          print(f"Validated relative links in {len(markdown_files)} Markdown files.")
+          PY
